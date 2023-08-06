@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/task_card"
+    android:layout_margin="10dp"
+    android:layout_width="match_parent"
+    android:elevation="0dp"
+    android:outlineAmbientShadowColor="@color/white"
+    android:outlineSpotShadowColor="@color/white"
+    android:backgroundTint="@color/red50"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="15dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:padding="10dp"
+        android:layout_height="match_parent">
+
+        <CheckBox
+            android:id="@+id/tc_ch_complete"
+            android:layout_width="20dp"
+            android:layout_centerVertical="true"
+            android:layout_height="20dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_toEndOf="@id/tc_ch_complete"
+            android:layout_marginStart="35dp"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:id="@+id/tc_lb_taskTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/task_title"/>
+
+            <TextView
+                android:id="@+id/tc_lb_taskDes"
+                android:textSize="11sp"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/task_des"/>
+
+            <TextView
+                android:id="@+id/tc_lb_taskDate"
+                android:textSize="11sp"
+                android:layout_marginTop="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/task_des"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/lb_tc_priority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/my_priority_background_red"
+            android:text="@string/priority"
+            android:textColor="@color/red"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            tools:ignore="RelativeOverlap" />
+
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
