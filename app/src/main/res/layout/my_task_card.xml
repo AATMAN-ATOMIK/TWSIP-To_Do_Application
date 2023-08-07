@@ -5,9 +5,7 @@
     android:id="@+id/task_card"
     android:layout_margin="10dp"
     android:layout_width="match_parent"
-    android:elevation="0dp"
-    android:outlineAmbientShadowColor="@color/white"
-    android:outlineSpotShadowColor="@color/white"
+    app:cardElevation="0dp"
     android:backgroundTint="@color/red50"
     android:layout_height="wrap_content"
     app:cardCornerRadius="15dp">
