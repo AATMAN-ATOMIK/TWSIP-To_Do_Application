@@ -6,7 +6,6 @@
     android:layout_margin="10dp"
     android:layout_width="match_parent"
     app:cardElevation="0dp"
-    android:backgroundTint="@color/red50"
     android:layout_height="wrap_content"
     app:cardCornerRadius="15dp">
 
@@ -58,17 +57,17 @@
                 android:text="@string/task_des"/>
         </LinearLayout>
 
-        <Button
+        <TextView
             android:id="@+id/lb_tc_priority"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/my_priority_background_red"
-            android:text="@string/priority"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp"
             android:textColor="@color/red"
+            android:text="@string/priority"
+            android:background="@drawable/my_priority_background_red"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            tools:ignore="RelativeOverlap" />
-
+            android:layout_centerVertical="true" />
 
 
     </RelativeLayout>
