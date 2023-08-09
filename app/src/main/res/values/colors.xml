@@ -11,4 +11,5 @@
     <color name="blue">#4F95FE</color>
     <color name="yellow50">#4BFFE500</color>
     <color name="yellow">#FFE500</color>
+    <color name="transparent">#00FFE500</color>
 </resources>

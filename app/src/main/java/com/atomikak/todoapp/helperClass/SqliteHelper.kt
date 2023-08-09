@@ -84,11 +84,11 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
         return res != -1
     }
 
-    fun completeTask(t_status: String): Boolean {
+    fun completeTask(t_id: Int): Boolean {
         val db = this.writableDatabase
         val contentValues = ContentValues()
-        contentValues.put("t_status", t_status)
-        val res = db.update("Tasks", contentValues, "t_id = ", arrayOf(t_status))
+        contentValues.put("t_status", "Complete")
+        val res = db.update("Tasks", contentValues, "t_id = ", arrayOf(t_id.toString()))
         return res != -1
     }
 

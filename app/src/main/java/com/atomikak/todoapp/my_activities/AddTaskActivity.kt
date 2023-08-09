@@ -153,7 +153,7 @@ class AddTaskActivity : AppCompatActivity() {
         //for assigning priority | category | reminder duration
         at_p_radio.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
-                R.id.at_rd_high -> priority = "Hige"
+                R.id.at_rd_high -> priority = "High"
                 R.id.at_rd_medium -> priority = "Medium"
                 R.id.at_rd_Regular -> priority = "Regular"
                 R.id.at_rd_normal -> priority = "Normal"
