@@ -85,6 +85,8 @@
             android:cursorVisible="false"
             android:drawableEnd="@drawable/baseline_edit_calendar_24"
             android:drawableTint="@color/red50"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:fontFamily="@font/poppins_medium"
             android:gravity="center_vertical"
             android:hint="@string/task_date"
@@ -108,12 +110,13 @@
             android:cursorVisible="false"
             android:drawableEnd="@drawable/baseline_access_time_24"
             android:drawableTint="@color/red70"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:fontFamily="@font/poppins_medium"
             android:gravity="center_vertical"
             android:hint="@string/task_time"
             android:importantForAutofill="no"
             android:inputType="date"
-
             android:maxLines="5"
             android:paddingHorizontal="20dp"
             android:paddingVertical="5dp"
@@ -128,6 +131,7 @@
         android:layout_below="@id/ut_dateTimeBar"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="13dp"
+
         android:background="@drawable/my_priority_background_red50"
         android:paddingHorizontal="20dp"
         android:paddingVertical="5dp" />
@@ -170,6 +174,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="High"
+            android:textStyle="bold"
             app:buttonTint="@color/red" />
 
         <RadioButton
@@ -178,6 +183,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Meduim"
+            android:textStyle="bold"
             app:buttonTint="@color/yellow" />
 
         <RadioButton
@@ -186,6 +192,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="normal"
+            android:textStyle="bold"
             app:buttonTint="@color/blue" />
 
         <RadioButton
@@ -194,6 +201,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Regular"
+            android:textStyle="bold"
             app:buttonTint="@color/green" />
     </RadioGroup>
 

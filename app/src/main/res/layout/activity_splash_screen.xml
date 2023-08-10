@@ -3,9 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
     android:layout_height="match_parent"
-    android:gravity="center"
     tools:context=".SplashScreen">
 
     <com.airbnb.lottie.LottieAnimationView
@@ -14,7 +12,7 @@
         app:lottie_rawRes="@raw/loding_animation"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        android:layout_height="350dp" />
+        android:layout_height="600dp" />
 
     <TextView
         android:id="@+id/sp_app_name"

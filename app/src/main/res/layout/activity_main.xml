@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
     android:layout_height="match_parent"
     tools:context=".my_activities.MainActivity">
 
@@ -32,7 +31,8 @@
     <TextView
         android:id="@+id/lb_my_task"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
         android:text="@string/my_task"
         android:textSize="13sp"
         android:textColor="@color/red"
@@ -46,12 +46,12 @@
     <Spinner
         android:id="@+id/sortBy"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:textSize="13sp"
-        android:textColor="@color/red"
+        style="@style/Widget.AppCompat.DropDownItem.Spinner"
+        android:textColor="@color/black"
         android:fontFamily="@font/poppins_bold"
         android:layout_alignParentEnd="true"
-        android:paddingEnd="10dp"
         android:layout_below="@id/m_recv_category"
         />
 

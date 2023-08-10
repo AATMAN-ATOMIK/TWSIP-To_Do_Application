@@ -64,9 +64,9 @@ class UpdateTaskActivity : AppCompatActivity() {
             val datePickerDialog = DatePickerDialog(
                 this,
                 { view, year, month, dayOfMonth ->
-                    ut_ed_taskDate.setText("$dayOfMonth / $month / $year")
+                    ut_ed_taskDate.setText("$dayOfMonth / ${month+1} / $year")
                     Day = dayOfMonth
-                    Month = month
+                    Month = month+1
                     myyear = year
                 },
                 calendar.get(Calendar.YEAR),

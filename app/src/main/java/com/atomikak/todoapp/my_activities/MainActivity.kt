@@ -6,6 +6,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -24,6 +28,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
+    private var cat: String? = null
+
     //widgets
     private lateinit var m_recv_category: RecyclerView
     private lateinit var m_recv_my_task: RecyclerView
@@ -37,6 +43,7 @@ class MainActivity : AppCompatActivity() {
 
     //Helper
     private lateinit var categoryList: ArrayList<String>
+    private lateinit var sortList: ArrayList<String>
     private lateinit var taskList: ArrayList<Task>
     private lateinit var sqliteHelper: SqliteHelper
 
@@ -67,10 +74,62 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
         m_recv_category.setHasFixedSize(true)
         m_recv_category.adapter = categoryAdapter
+        categoryAdapter.OnClick(object:MyCheckBoxClick{
+            override fun OnCheckCliked(position: Int, type: String) {
+                cat = categoryList[position]
+                getTaskList(sort=null, status = null, sortType = null,cat=cat)
+            }
+        })
 
         taskList = ArrayList()
-        getTaskList(null,null,null)
 
+        //sorting functionality
+        sortList = arrayListOf("Sort By Newest", "Sort By Oldest", "Sort Completed", "Sort Pending")
+        sortBy.adapter =
+            ArrayAdapter(this@MainActivity, android.R.layout.simple_dropdown_item_1line, sortList)
+
+        sortBy.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                when (sortList[position]) {
+                    "Sort By Newest" -> getTaskList(
+                        sort = "t_date",
+                        sortType = "DESC",
+                        status = null,
+                        cat = cat
+                    )
+
+                    "Sort By Oldest" -> getTaskList(
+                        sort = "t_date",
+                        sortType = "ASC",
+                        status = null,
+                        cat = cat
+                    )
+
+                    "Sort Completed" -> getTaskList(
+                        sort = null,
+                        sortType = null,
+                        status = "Complete",
+                        cat = cat
+                    )
+
+                    "Sort Pending" -> getTaskList(
+                        sort = null,
+                        sortType = null,
+                        status = "Pending",
+                        cat = cat
+                    )
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                getTaskList(sort = "t_date", sortType = "ASC", status = "Pending", cat = cat)
+            }
+        }
 
         m_addTask.setOnClickListener {
             val intent = Intent(this@MainActivity, AddTaskActivity::class.java)
@@ -86,16 +145,16 @@ class MainActivity : AppCompatActivity() {
         m_recv_my_task.setHasFixedSize(true)
         m_recv_my_task.adapter = taskAdapter
         taskAdapter.myclick(object : MyCheckBoxClick {
-            override fun OnCheckCliked(position: Int,type:String) {
-                if(type == "check"){
+            override fun OnCheckCliked(position: Int, type: String) {
+                if (type == "check") {
                     if (taskList[position].t_status == "Pending") {
-                        viewUpdateDialog("Pending",position)
+                        viewUpdateDialog("Pending", position)
                     } else {
-                        viewUpdateDialog("Complete",position)
+                        viewUpdateDialog("Complete", position)
                     }
-                }else{
-                    val intent = Intent(this@MainActivity,UpdateTaskActivity::class.java)
-                    intent.putExtra("taskId",taskList[position].t_id.toString())
+                } else {
+                    val intent = Intent(this@MainActivity, UpdateTaskActivity::class.java)
+                    intent.putExtra("taskId", taskList[position].t_id.toString())
                     startActivity(intent)
                 }
             }
@@ -110,31 +169,31 @@ class MainActivity : AppCompatActivity() {
                 .setNegativeButton("Complete", object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, which: Int) {
                         sqliteHelper.completeTask(taskList[position].t_id!!)
-                        getTaskList(null,null,null)
+                        getTaskList(null, null, null, null)
                     }
                 })
                 .setPositiveButton("Complete & Delete", object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, which: Int) {
                         sqliteHelper.deleteTask(taskList[position].t_id!!)
-                        getTaskList(null,null,null)
+                        getTaskList(null, null, null, null)
                     }
                 })
                 .create()
             alertDialog.show()
-        }else{
+        } else {
             val alertDialog = AlertDialog.Builder(this@MainActivity)
                 .setTitle("Delete Task")
                 .setMessage("Do you really want to remove the completed task ?.")
                 .setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, which: Int) {
                         dialog!!.dismiss()
-                        getTaskList(null,null,null)
+                        getTaskList(null, null, null, null)
                     }
                 })
                 .setPositiveButton("Delete", object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface?, which: Int) {
                         sqliteHelper.deleteTask(taskList[position].t_id!!)
-                        getTaskList(null,null,null)
+                        getTaskList(null, null, null, null)
                     }
                 })
                 .create()
@@ -223,55 +282,145 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getTaskList(sort:String?,status:String?,sortType:String?) {
+    private fun getTaskList(sort: String?, status: String?, sortType: String?, cat: String?) {
         taskList.removeAll(taskList.toSet())
-        if(sort.isNullOrEmpty()&&status.isNullOrEmpty()&&sortType.isNullOrEmpty()){
-            val cr = sqliteHelper.showTask()
-            while (cr.moveToNext()) {
-                taskList.add(
-                    Task(
-                        t_id = cr.getInt(0),
-                        c_name = cr.getString(1).toString(),
-                        t_title = cr.getString(2).toString(),
-                        t_des = cr.getString(3).toString(),
-                        t_time = cr.getString(4).toString(),
-                        t_date = cr.getString(5).toString(),
-                        t_status = cr.getString(6).toString(),
-                        t_priority = cr.getString(7).toString()
+        if(cat==null){
+            if (sort.isNullOrEmpty() && status.isNullOrEmpty() && sortType.isNullOrEmpty()) {
+                val cr = sqliteHelper.showTask()
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
                     )
-                )
+                }
             }
-        }else if(status!=null&&sortType.isNullOrEmpty()&&sort.isNullOrEmpty()){
-            val cr = sqliteHelper.showTask(status=status)
-            while (cr.moveToNext()) {
-                taskList.add(
-                    Task(
-                        t_id = cr.getInt(0),
-                        c_name = cr.getString(1).toString(),
-                        t_title = cr.getString(2).toString(),
-                        t_des = cr.getString(3).toString(),
-                        t_time = cr.getString(4).toString(),
-                        t_date = cr.getString(5).toString(),
-                        t_status = cr.getString(6).toString(),
-                        t_priority = cr.getString(7).toString()
+            else if (status != null && sortType.isNullOrEmpty() && sort.isNullOrEmpty()) {
+                val cr = sqliteHelper.showTask(status = status)
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
                     )
-                )
+                }
             }
-        }else if(status.isNullOrEmpty()&&sortType!=null&&sort!=null){
-            val cr = sqliteHelper.showTask(sort=sort, sortStyle = sortType)
-            while (cr.moveToNext()) {
-                taskList.add(
-                    Task(
-                        t_id = cr.getInt(0),
-                        c_name = cr.getString(1).toString(),
-                        t_title = cr.getString(2).toString(),
-                        t_des = cr.getString(3).toString(),
-                        t_time = cr.getString(4).toString(),
-                        t_date = cr.getString(5).toString(),
-                        t_status = cr.getString(6).toString(),
-                        t_priority = cr.getString(7).toString()
+            else if (status.isNullOrEmpty() && sortType != null && sort != null) {
+                val cr = sqliteHelper.showTask(sort = sort, sortStyle = sortType)
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
                     )
-                )
+                }
+            }
+            else {
+                val cr = sqliteHelper.showTask(sort = sort, sortStyle = sortType, status = status)
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
+                    )
+                }
+            }
+        }else{
+            if (sort.isNullOrEmpty() && status.isNullOrEmpty() && sortType.isNullOrEmpty()) {
+                val cr = sqliteHelper.showTask(cat=cat)
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
+                    )
+                }
+            }
+            else if (status != null && sortType.isNullOrEmpty() && sort.isNullOrEmpty()) {
+                val cr = sqliteHelper.showTask(status = status,cat=cat)
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
+                    )
+                }
+            }
+            else if (status.isNullOrEmpty() && sortType != null && sort != null) {
+                val cr = sqliteHelper.showTask(sort = sort, sortStyle = sortType, cat = cat)
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
+                    )
+                }
+            }
+            else {
+                val cr = sqliteHelper.showTask(sort = sort, sortStyle = sortType, status = status, cat = cat)
+                while (cr.moveToNext()) {
+                    taskList.add(
+                        Task(
+                            t_id = cr.getInt(0),
+                            c_name = cr.getString(1).toString(),
+                            t_title = cr.getString(2).toString(),
+                            t_des = cr.getString(3).toString(),
+                            t_time = cr.getString(4).toString(),
+                            t_date = cr.getString(5).toString(),
+                            t_status = cr.getString(6).toString(),
+                            t_priority = cr.getString(7).toString()
+                        )
+                    )
+                }
             }
         }
 

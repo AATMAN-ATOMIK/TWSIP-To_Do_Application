@@ -14,9 +14,12 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
         try {
             db!!.execSQL("CREATE TABLE Category ( c_id INTEGER PRIMARY KEY AUTOINCREMENT , c_name TEXT )")
             db!!.execSQL("CREATE TABLE Tasks ( t_id INTEGER PRIMARY KEY AUTOINCREMENT ,c_name TEXT ,t_title TEXT ,t_des TEXT ,t_time TEXT ,t_date Date ,t_status TEXT,t_priority TEXT)")
-            val cv = ContentValues()
-            cv.put("c_name", "Daily")
-            db.insert("Category", null, cv)
+            val cv1 = ContentValues()
+            cv1.put("c_name", "All")
+            db.insert("Category", null, cv1)
+            val cv2 = ContentValues()
+            cv2.put("c_name", "Daily")
+            db.insert("Category", null, cv2)
 
         } catch (e: Exception) {
             Log.d("ERR: ",e.message.toString())
@@ -26,6 +29,7 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         try {
             db!!.execSQL("DROP TABLE IF EXISTS Tasks")
+            db!!.execSQL("DROP TABLE IF EXISTS Category")
         } catch (e: Exception) {
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
         }
@@ -66,7 +70,6 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
 
     fun updateTask(task: Task, t_id: String): Boolean {
         Log.d( "DD","${task.c_name},${task.t_title},${task.t_des},${task.t_date},${task.t_title},${task.t_status},${task.t_priority},${t_id}")
-        Toast.makeText(context, "hi", Toast.LENGTH_SHORT).show()
         val db = this.writableDatabase
         val contentValue: ContentValues = ContentValues()
         contentValue.put("c_name", task.c_name.toString())
@@ -81,7 +84,6 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
     }
 
     fun deleteTask(t_id: Int): Boolean {
-        Toast.makeText(context, "hi", Toast.LENGTH_SHORT).show()
         val db = this.writableDatabase
         val res = db.delete("Tasks", "t_id = ?", arrayOf(t_id.toString()))
         return res != -1
@@ -96,20 +98,37 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
         return res != -1
     }
 
-    fun showTask(sort: String? = null, status: String? = null, sortStyle: String? = null): Cursor {
+    fun showTask(sort: String? = null, status: String? = null, sortStyle: String? = null,cat:String?=null): Cursor {
         val db = this.readableDatabase
-        return if (sort == null && status == null && sortStyle == null) {
-            db.rawQuery("SELECT * FROM Tasks", null)
-        } else {
-            if (sort == null) {
-                db.rawQuery("SELECT * FROM Tasks WHERE t_status = ?", arrayOf(status))
-            } else if (status == null) {
-                db.rawQuery("SELECT * FROM Tasks ORDER BY $sort $sortStyle", null)
+        if(cat==null||cat=="All"){
+            return if (sort == null && status == null && sortStyle == null) {
+                db.rawQuery("SELECT * FROM Tasks", null)
             } else {
-                db.rawQuery(
-                    "SELECT * FROM Tasks ORDER BY $sort $sortStyle WHERE t_status = ?",
-                    arrayOf(status)
-                )
+                if (sort == null) {
+                    db.rawQuery("SELECT * FROM Tasks WHERE t_status = ?", arrayOf(status))
+                } else if (status == null) {
+                    db.rawQuery("SELECT * FROM Tasks ORDER BY $sort $sortStyle", null)
+                } else {
+                    db.rawQuery(
+                        "SELECT * FROM Tasks WHERE t_status = ? ORDER BY $sort $sortStyle ",
+                        arrayOf(status)
+                    )
+                }
+            }
+        }else{
+            return if (sort == null && status == null && sortStyle == null) {
+                db.rawQuery("SELECT * FROM Tasks WHERE c_name = ?", arrayOf(cat))
+            } else {
+                if (sort == null) {
+                    db.rawQuery("SELECT * FROM Tasks WHERE t_status = ? AND c_name = ?", arrayOf(status,cat))
+                } else if (status == null) {
+                    db.rawQuery("SELECT * FROM Tasks WHERE c_name = ? ORDER BY $sort $sortStyle ", arrayOf(cat))
+                } else {
+                    db.rawQuery(
+                        "SELECT * FROM Tasks WHERE t_status = ? AND c_name = ? ORDER BY $sort $sortStyle ",
+                        arrayOf(status,cat)
+                    )
+                }
             }
         }
     }

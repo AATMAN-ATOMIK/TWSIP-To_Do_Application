@@ -113,9 +113,9 @@ class AddTaskActivity : AppCompatActivity() {
             val datePickerDialog = DatePickerDialog(
                 this,
                 { view, year, month, dayOfMonth ->
-                    at_ed_taskDate.setText("$dayOfMonth / $month / $year")
+                    at_ed_taskDate.setText("$dayOfMonth/${month+1}/$year")
                     Day = dayOfMonth
-                    Month = month
+                    Month = month+1
                     myyear = year
                 },
                 calendar.get(Calendar.YEAR),
@@ -205,7 +205,7 @@ class AddTaskActivity : AppCompatActivity() {
                             Minute!!.toInt() - reminderDuration.substring(0, 2).toInt()
                         calendar[Calendar.SECOND] = 0
                         calendar[Calendar.MILLISECOND] = 0
-
+                        Toast.makeText(this@AddTaskActivity, "hi", Toast.LENGTH_SHORT).show()
                         buildNotification()
                         setMyReminder()
                         addTask()
@@ -213,6 +213,9 @@ class AddTaskActivity : AppCompatActivity() {
                 } else {
                     addTask()
                 }
+            }
+            else{
+                Toast.makeText(this@AddTaskActivity, "Please enter all the details.", Toast.LENGTH_SHORT).show()
             }
 
         }
@@ -262,6 +265,7 @@ class AddTaskActivity : AppCompatActivity() {
             t_priority = priority.toString(),
         )
         sqliteHelper.addTask(task)
+        goToHome()
     }
 
     private fun getCategory() {
