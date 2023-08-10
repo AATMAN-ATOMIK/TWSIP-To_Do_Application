@@ -8,6 +8,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.MediaController
+import android.widget.Toast
 
 class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -25,5 +27,7 @@ class NotificationReceiver : BroadcastReceiver() {
         val notification:Notification = intent!!.getParcelableExtra("notification")!!
 
         notificationManager.notify(0,notification)
+
+
     }
 }

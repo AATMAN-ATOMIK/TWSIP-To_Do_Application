@@ -198,14 +198,12 @@ class AddTaskActivity : AppCompatActivity() {
                 if (at_ch_remindMe.isChecked) {
                     if (reminderDuration.isNotEmpty()) {
                         calendar[Calendar.DAY_OF_MONTH] = Day!!.toInt()
-                        calendar[Calendar.MONTH] = Month!!.toInt()
+                        calendar[Calendar.MONTH] = Month!!.toInt()-1
                         calendar[Calendar.YEAR] = myyear!!.toInt()
                         calendar[Calendar.HOUR_OF_DAY] = Hour!!.toInt()
-                        calendar[Calendar.MINUTE] =
-                            Minute!!.toInt() - reminderDuration.substring(0, 2).toInt()
+                        calendar[Calendar.MINUTE] = Minute!!.toInt() - reminderDuration.substring(0, 2).toInt()
                         calendar[Calendar.SECOND] = 0
                         calendar[Calendar.MILLISECOND] = 0
-                        Toast.makeText(this@AddTaskActivity, "hi", Toast.LENGTH_SHORT).show()
                         buildNotification()
                         setMyReminder()
                         addTask()
@@ -228,7 +226,7 @@ class AddTaskActivity : AppCompatActivity() {
                 .setContentTitle(at_ed_taskTitle.text.toString())
                 .setContentText(at_ed_taskDes.text.toString())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setAutoCancel(true)
+                .setAutoCancel(false)
                 .setChannelId("Task_Notification")
                 .build()
         } else {
@@ -236,7 +234,7 @@ class AddTaskActivity : AppCompatActivity() {
                 .setContentTitle(at_ed_taskTitle.text.toString())
                 .setContentText(at_ed_taskDes.text.toString())
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setAutoCancel(true)
+                .setAutoCancel(false)
                 .build()
         }
     }
@@ -249,9 +247,13 @@ class AddTaskActivity : AppCompatActivity() {
             this@AddTaskActivity,
             0,
             intent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_MUTABLE
         )
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        }else{
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        }
     }
 
     private fun addTask() {

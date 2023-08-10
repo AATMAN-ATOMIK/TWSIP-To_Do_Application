@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -166,36 +167,32 @@ class MainActivity : AppCompatActivity() {
             val alertDialog = AlertDialog.Builder(this@MainActivity)
                 .setTitle("Update Task Status")
                 .setMessage("Please select how you want to change status.")
-                .setNegativeButton("Complete", object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        sqliteHelper.completeTask(taskList[position].t_id!!)
-                        getTaskList(null, null, null, null)
-                    }
-                })
-                .setPositiveButton("Complete & Delete", object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        sqliteHelper.deleteTask(taskList[position].t_id!!)
-                        getTaskList(null, null, null, null)
-                    }
-                })
+                .setNegativeButton("Complete"
+                ) { dialog, which ->
+                    sqliteHelper.completeTask(taskList[position].t_id!!)
+                    getTaskList(null, null, null, null)
+                }
+                .setPositiveButton("Complete & Delete"
+                ) { dialog, which ->
+                    sqliteHelper.deleteTask(taskList[position].t_id!!)
+                    getTaskList(null, null, null, null)
+                }
                 .create()
             alertDialog.show()
         } else {
             val alertDialog = AlertDialog.Builder(this@MainActivity)
                 .setTitle("Delete Task")
                 .setMessage("Do you really want to remove the completed task ?.")
-                .setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        dialog!!.dismiss()
-                        getTaskList(null, null, null, null)
-                    }
-                })
-                .setPositiveButton("Delete", object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface?, which: Int) {
-                        sqliteHelper.deleteTask(taskList[position].t_id!!)
-                        getTaskList(null, null, null, null)
-                    }
-                })
+                .setNegativeButton("Cancel"
+                ) { dialog, which ->
+                    dialog!!.dismiss()
+                    getTaskList(null, null, null, null)
+                }
+                .setPositiveButton("Delete"
+                ) { dialog, which ->
+                    sqliteHelper.deleteTask(taskList[position].t_id!!)
+                    getTaskList(null, null, null, null)
+                }
                 .create()
             alertDialog.show()
         }
@@ -216,29 +213,29 @@ class MainActivity : AppCompatActivity() {
                 val alertDialog = AlertDialog.Builder(this@MainActivity)
                     .setTitle("Permission Required")
                     .setMessage("Notification Permission is required in order to get notification of your tasks.")
-                    .setPositiveButton("Allow", object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                    .setPositiveButton("Allow"
+                    ) { dialog, which ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             ActivityCompat.requestPermissions(
                                 this@MainActivity,
                                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
                                 200
                             )
                         }
-                    })
-                    .setNegativeButton("Deny", object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
-                            dialog!!.dismiss()
-                        }
-                    })
+                    }
+                    .setNegativeButton("Deny"
+                    ) { dialog, which -> dialog!!.dismiss() }
                     .create()
 
                 alertDialog.show()
             } else {
-                ActivityCompat.requestPermissions(
-                    this@MainActivity,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    200
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.requestPermissions(
+                        this@MainActivity,
+                        arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                        200
+                    )
+                }
             }
         }
 
@@ -255,29 +252,29 @@ class MainActivity : AppCompatActivity() {
                 val alertDialog = AlertDialog.Builder(this@MainActivity)
                     .setTitle("Permission Required")
                     .setMessage("Notification Permission is required in order to get notification of your tasks.")
-                    .setPositiveButton("Allow", object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
+                    .setPositiveButton("Allow"
+                    ) { dialog, which ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             ActivityCompat.requestPermissions(
                                 this@MainActivity,
                                 arrayOf(Manifest.permission.USE_EXACT_ALARM),
                                 200
                             )
                         }
-                    })
-                    .setNegativeButton("Deny", object : DialogInterface.OnClickListener {
-                        override fun onClick(dialog: DialogInterface?, which: Int) {
-                            dialog!!.dismiss()
-                        }
-                    })
+                    }
+                    .setNegativeButton("Deny"
+                    ) { dialog, which -> dialog!!.dismiss() }
                     .create()
 
                 alertDialog.show()
             } else {
-                ActivityCompat.requestPermissions(
-                    this@MainActivity,
-                    arrayOf(Manifest.permission.USE_EXACT_ALARM),
-                    200
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.requestPermissions(
+                        this@MainActivity,
+                        arrayOf(Manifest.permission.USE_EXACT_ALARM),
+                        200
+                    )
+                }
             }
         }
     }
