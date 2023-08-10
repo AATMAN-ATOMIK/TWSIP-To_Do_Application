@@ -67,53 +67,65 @@
         android:paddingVertical="5dp"
         android:textSize="16sp" />
 
-    <EditText
-        android:id="@+id/ut_ed_taskDate"
-        android:layout_width="190dp"
-        android:layout_height="40dp"
-        android:layout_below="@id/ut_ed_taskDes"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="13dp"
-        android:background="@drawable/my_priority_background_red50"
-        android:drawableEnd="@drawable/baseline_edit_calendar_24"
-        android:drawableTint="@color/red70"
-        android:fontFamily="@font/poppins_medium"
-        android:gravity="center_vertical"
-        android:hint="@string/task_date"
-        android:importantForAutofill="no"
-        android:inputType="date"
-        android:maxLines="5"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="5dp"
-        android:textSize="16sp" />
+    <LinearLayout
+        android:id="@+id/ut_dateTimeBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ut_ed_taskDes">
 
-    <EditText
-        android:id="@+id/at_ed_taskTime"
-        android:layout_width="190dp"
-        android:layout_height="40dp"
-        android:layout_below="@id/ut_ed_taskDes"
-        android:layout_alignParentEnd="true"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="13dp"
-        android:background="@drawable/my_priority_background_red50"
-        android:drawableEnd="@drawable/baseline_access_time_24"
-        android:drawableTint="@color/red70"
-        android:fontFamily="@font/poppins_medium"
-        android:gravity="center_vertical"
-        android:hint="@string/task_time"
-        android:importantForAutofill="no"
-        android:inputType="date"
-        android:maxLines="5"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="5dp"
-        android:textSize="16sp" />
+        <EditText
+            android:id="@+id/ut_ed_taskDate"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="13dp"
+            android:layout_weight="1"
+            android:background="@drawable/my_priority_background_red50"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:drawableEnd="@drawable/baseline_edit_calendar_24"
+            android:drawableTint="@color/red50"
+            android:fontFamily="@font/poppins_medium"
+            android:gravity="center_vertical"
+            android:hint="@string/task_date"
+            android:importantForAutofill="no"
+            android:inputType="date"
+            android:maxLines="5"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="5dp"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/ut_ed_taskTime"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="13dp"
+            android:layout_weight="1"
+            android:background="@drawable/my_priority_background_red50"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:drawableEnd="@drawable/baseline_access_time_24"
+            android:drawableTint="@color/red70"
+            android:fontFamily="@font/poppins_medium"
+            android:gravity="center_vertical"
+            android:hint="@string/task_time"
+            android:importantForAutofill="no"
+            android:inputType="date"
+
+            android:maxLines="5"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="5dp"
+            android:textSize="16sp" />
+    </LinearLayout>
 
 
     <Spinner
         android:id="@+id/ut_sp_taskCategory"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_below="@id/ut_ed_taskDate"
+        android:layout_below="@id/ut_dateTimeBar"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="13dp"
         android:background="@drawable/my_priority_background_red50"
@@ -144,16 +156,57 @@
         android:textSize="13sp"
         app:buttonTint="@color/red" />
 
-    <Button
-        android:id="@+id/at_btn_addTask"
+    <RadioGroup
+        android:id="@+id/ut_p_radio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ut_ch_remindMe"
         android:layout_marginHorizontal="10dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/at_rd_high"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="High"
+            app:buttonTint="@color/red" />
+
+        <RadioButton
+            android:id="@+id/at_rd_medium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Meduim"
+            app:buttonTint="@color/yellow" />
+
+        <RadioButton
+            android:id="@+id/at_rd_normal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="normal"
+            app:buttonTint="@color/blue" />
+
+        <RadioButton
+            android:id="@+id/at_rd_Regular"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Regular"
+            app:buttonTint="@color/green" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/ut_btn_addTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ut_p_radio"
+        android:layout_marginHorizontal="10dp"
         android:layout_marginTop="13dp"
         android:fontFamily="@font/poppins_bold"
         android:paddingVertical="10dp"
-        android:text="@string/add_task"
+        android:text="@string/update_task"
         app:cornerRadius="15dp" />
 
 </RelativeLayout>

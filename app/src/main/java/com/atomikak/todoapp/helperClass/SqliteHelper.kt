@@ -14,9 +14,9 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
         try {
             db!!.execSQL("CREATE TABLE Category ( c_id INTEGER PRIMARY KEY AUTOINCREMENT , c_name TEXT )")
             db!!.execSQL("CREATE TABLE Tasks ( t_id INTEGER PRIMARY KEY AUTOINCREMENT ,c_name TEXT ,t_title TEXT ,t_des TEXT ,t_time TEXT ,t_date Date ,t_status TEXT,t_priority TEXT)")
-//            val cv = ContentValues()
-//            cv.put("c_name", "Daily")
-//            db.insert("Category", null, cv)
+            val cv = ContentValues()
+            cv.put("c_name", "Daily")
+            db.insert("Category", null, cv)
 
         } catch (e: Exception) {
             Log.d("ERR: ",e.message.toString())
@@ -64,9 +64,11 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
     }
 
 
-    fun updateTask(task: Task, t_id: Int): Boolean {
+    fun updateTask(task: Task, t_id: String): Boolean {
+        Log.d( "DD","${task.c_name},${task.t_title},${task.t_des},${task.t_date},${task.t_title},${task.t_status},${task.t_priority},${t_id}")
+        Toast.makeText(context, "hi", Toast.LENGTH_SHORT).show()
         val db = this.writableDatabase
-        var contentValue: ContentValues = ContentValues()
+        val contentValue: ContentValues = ContentValues()
         contentValue.put("c_name", task.c_name.toString())
         contentValue.put("t_title", task.t_title.toString())
         contentValue.put("t_des", task.t_des.toString())
@@ -74,21 +76,23 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
         contentValue.put("t_date", task.t_date.toString())
         contentValue.put("t_status", task.t_status.toString())
         contentValue.put("t_priority", task.t_priority.toString())
-        val res = db.update("Tasks", contentValue, "t_id = ", arrayOf(t_id.toString()))
+        val res = db.update("Tasks", contentValue, "t_id = ?", arrayOf(t_id))
         return res != -1
     }
 
     fun deleteTask(t_id: Int): Boolean {
+        Toast.makeText(context, "hi", Toast.LENGTH_SHORT).show()
         val db = this.writableDatabase
-        val res = db.delete("Tasks", "t_id = ", arrayOf(t_id.toString()))
+        val res = db.delete("Tasks", "t_id = ?", arrayOf(t_id.toString()))
         return res != -1
     }
 
     fun completeTask(t_id: Int): Boolean {
+        Log.d("DD:","HI")
         val db = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put("t_status", "Complete")
-        val res = db.update("Tasks", contentValues, "t_id = ", arrayOf(t_id.toString()))
+        val res = db.update("Tasks", contentValues, "t_id = ?", arrayOf(t_id.toString()))
         return res != -1
     }
 
@@ -108,5 +112,10 @@ class SqliteHelper(val context: Context) : SQLiteOpenHelper(context, "MyTasks", 
                 )
             }
         }
+    }
+
+    fun showTaskOfId(id:String): Cursor? {
+        val db = this.readableDatabase
+        return db.rawQuery("SELECT * FROM Tasks WHERE t_id = ?", arrayOf(id))
     }
 }

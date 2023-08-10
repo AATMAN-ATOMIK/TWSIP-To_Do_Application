@@ -4,16 +4,13 @@ import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Spinner
 import android.widget.TextView
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.atomikak.todoapp.R
@@ -22,15 +19,15 @@ import com.atomikak.todoapp.adapters.TaskAdapter
 import com.atomikak.todoapp.helperClass.Category
 import com.atomikak.todoapp.helperClass.SqliteHelper
 import com.atomikak.todoapp.helperClass.Task
+import com.atomikak.todoapp.listeners.MyCheckBoxClick
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.security.Permission
 
 class MainActivity : AppCompatActivity() {
 
     //widgets
     private lateinit var m_recv_category: RecyclerView
     private lateinit var m_recv_my_task: RecyclerView
-    private lateinit var sortByDate: TextView
+    private lateinit var sortBy: Spinner
     private lateinit var m_addTask: FloatingActionButton
 
 
@@ -58,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         m_recv_category = findViewById(R.id.m_recv_category)
         m_recv_my_task = findViewById(R.id.m_recv_my_task)
-        sortByDate = findViewById(R.id.sortByDate)
+        sortBy = findViewById(R.id.sortBy)
         m_addTask = findViewById(R.id.m_addTask)
         categoryList = arrayListOf()
         sqliteHelper = SqliteHelper(context = this@MainActivity)
@@ -72,21 +69,76 @@ class MainActivity : AppCompatActivity() {
         m_recv_category.adapter = categoryAdapter
 
         taskList = ArrayList()
-        getTaskList()
-        taskAdapter = TaskAdapter(this@MainActivity, taskList)
-        m_recv_my_task.layoutManager =
-            LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
-        m_recv_my_task.setHasFixedSize(true)
-        m_recv_my_task.adapter = taskAdapter
-
-
-
+        getTaskList(null,null,null)
 
 
         m_addTask.setOnClickListener {
             val intent = Intent(this@MainActivity, AddTaskActivity::class.java)
             startActivity(intent)
             this.finish()
+        }
+    }
+
+    private fun feedTaskRecyclerView() {
+        taskAdapter = TaskAdapter(this@MainActivity, taskList)
+        m_recv_my_task.layoutManager =
+            LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
+        m_recv_my_task.setHasFixedSize(true)
+        m_recv_my_task.adapter = taskAdapter
+        taskAdapter.myclick(object : MyCheckBoxClick {
+            override fun OnCheckCliked(position: Int,type:String) {
+                if(type == "check"){
+                    if (taskList[position].t_status == "Pending") {
+                        viewUpdateDialog("Pending",position)
+                    } else {
+                        viewUpdateDialog("Complete",position)
+                    }
+                }else{
+                    val intent = Intent(this@MainActivity,UpdateTaskActivity::class.java)
+                    intent.putExtra("taskId",taskList[position].t_id.toString())
+                    startActivity(intent)
+                }
+            }
+        })
+    }
+
+    private fun viewUpdateDialog(s: String, position: Int) {
+        if (s == "Pending") {
+            val alertDialog = AlertDialog.Builder(this@MainActivity)
+                .setTitle("Update Task Status")
+                .setMessage("Please select how you want to change status.")
+                .setNegativeButton("Complete", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        sqliteHelper.completeTask(taskList[position].t_id!!)
+                        getTaskList(null,null,null)
+                    }
+                })
+                .setPositiveButton("Complete & Delete", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        sqliteHelper.deleteTask(taskList[position].t_id!!)
+                        getTaskList(null,null,null)
+                    }
+                })
+                .create()
+            alertDialog.show()
+        }else{
+            val alertDialog = AlertDialog.Builder(this@MainActivity)
+                .setTitle("Delete Task")
+                .setMessage("Do you really want to remove the completed task ?.")
+                .setNegativeButton("Cancel", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        dialog!!.dismiss()
+                        getTaskList(null,null,null)
+                    }
+                })
+                .setPositiveButton("Delete", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        sqliteHelper.deleteTask(taskList[position].t_id!!)
+                        getTaskList(null,null,null)
+                    }
+                })
+                .create()
+            alertDialog.show()
         }
     }
 
@@ -170,11 +222,47 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-        private fun getTaskList() {
+
+    private fun getTaskList(sort:String?,status:String?,sortType:String?) {
+        taskList.removeAll(taskList.toSet())
+        if(sort.isNullOrEmpty()&&status.isNullOrEmpty()&&sortType.isNullOrEmpty()){
             val cr = sqliteHelper.showTask()
             while (cr.moveToNext()) {
                 taskList.add(
                     Task(
+                        t_id = cr.getInt(0),
+                        c_name = cr.getString(1).toString(),
+                        t_title = cr.getString(2).toString(),
+                        t_des = cr.getString(3).toString(),
+                        t_time = cr.getString(4).toString(),
+                        t_date = cr.getString(5).toString(),
+                        t_status = cr.getString(6).toString(),
+                        t_priority = cr.getString(7).toString()
+                    )
+                )
+            }
+        }else if(status!=null&&sortType.isNullOrEmpty()&&sort.isNullOrEmpty()){
+            val cr = sqliteHelper.showTask(status=status)
+            while (cr.moveToNext()) {
+                taskList.add(
+                    Task(
+                        t_id = cr.getInt(0),
+                        c_name = cr.getString(1).toString(),
+                        t_title = cr.getString(2).toString(),
+                        t_des = cr.getString(3).toString(),
+                        t_time = cr.getString(4).toString(),
+                        t_date = cr.getString(5).toString(),
+                        t_status = cr.getString(6).toString(),
+                        t_priority = cr.getString(7).toString()
+                    )
+                )
+            }
+        }else if(status.isNullOrEmpty()&&sortType!=null&&sort!=null){
+            val cr = sqliteHelper.showTask(sort=sort, sortStyle = sortType)
+            while (cr.moveToNext()) {
+                taskList.add(
+                    Task(
+                        t_id = cr.getInt(0),
                         c_name = cr.getString(1).toString(),
                         t_title = cr.getString(2).toString(),
                         t_des = cr.getString(3).toString(),
@@ -187,8 +275,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        feedTaskRecyclerView()
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
         finishAffinity()
     }
+
 }
